@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>קופת היומי</title>
+<style>
+:root{
+  --bg:#f3f1ec;--surface:#fffdf8;--ink:#1d2a24;--muted:#6b756f;--line:#ddd8cc;--accent:#1f6b4f;--accent-ink:#fff;--danger:#a4372b;--hl:#e6efe8;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a17;--surface:#1c2420;--ink:#ecefe9;--muted:#9aa59d;--line:#2f3a34;--accent:#5fc197;--accent-ink:#0f1a14;--danger:#e57a6c;--hl:#243229}}
+:root[data-theme="dark"]{--bg:#141a17;--surface:#1c2420;--ink:#ecefe9;--muted:#9aa59d;--line:#2f3a34;--accent:#5fc197;--accent-ink:#0f1a14;--danger:#e57a6c;--hl:#243229}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Heebo","Assistant","Segoe UI",Arial,sans-serif;line-height:1.5}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.4rem;margin:0 0 16px;font-weight:700}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.nav button{background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:8px;width:44px;height:44px;font-size:1.2rem;cursor:pointer}
+.nav .m{font-size:1.15rem;font-weight:600}
+.total{background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:20px;margin-bottom:14px}
+.total .big{font-size:2.6rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.total .sub{opacity:.9;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
+.stat b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.8rem}
+.add{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:18px}
+.add h2,.list h2{font-size:1rem;margin:0 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:44px;flex:1;min-width:120px}
+input:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;font:inherit;font-weight:600;padding:10px 18px;min-height:44px;cursor:pointer;width:100%}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;padding:10px 12px}
+.day.today{border-color:var(--accent);background:var(--hl)}
+.dh{display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.dh .amt{font-variant-numeric:tabular-nums}
+.ent{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.92rem;padding-top:4px}
+.ent button{background:none;border:0;color:var(--danger);cursor:pointer;font:inherit;min-height:32px;padding:0 6px}
+.empty{color:var(--muted);text-align:center;padding:24px 0}
+.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1;min-height:44px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;font:inherit;cursor:pointer}.tabs button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}.gh{grid-column:1/-1;font-weight:700;font-size:.9rem;color:var(--muted)}
+.dn{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:0 10px}.dn span{min-width:56px;font-weight:600}.dn input{border:0;min-width:0;text-align:center;background:transparent}
+.dsum{margin:4px 0 10px;font-size:1.05rem}.cb{white-space:pre-line;font-size:.95rem}
+.status{min-height:1.4em;margin-top:8px;text-align:center;font-weight:600;color:var(--accent)}.gate{text-align:center;padding:48px 16px;color:var(--muted)}
+body.fill .nav,body.fill .total,body.fill .stats,body.fill .cardc,body.fill .list,body.fill .tools{display:none}
+.trio{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.bx{background:rgba(255,255,255,.18);border-radius:10px;padding:8px 12px}.bx span{display:block;font-size:.9rem;opacity:.9}.bx b{font-size:1.3rem;font-variant-numeric:tabular-nums}
+.bx.bxin{background:#16a34a;color:#fff}
+.bx.bxout{background:#b3261e;color:#fff}
+.day.out{border-color:var(--danger)}.day.out .amt{color:var(--danger)}
+.tools{display:flex;gap:8px;margin-top:18px}
+.tools button{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:8px;min-height:44px;font:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="gate" class="gate">טוען…</div>
+<main id="main" hidden>
+  <h1>הכנסות מזומן</h1>
+  <div class="nav">
+    <button id="next" aria-label="חודש הבא">›</button>
+    <div class="m" id="mlabel"></div>
+    <button id="prev" aria-label="חודש קודם">‹</button>
+  </div>
+  <div class="total">
+    <div class="sub">נשאר בקופה החודש</div>
+    <div class="big" id="sum">₪0</div>
+    <div class="trio"><div class="bx bxin"><span>נכנס החודש</span><b id="incV">₪0</b></div><div class="bx bxout"><span>יצא מהקופה</span><b id="outV">₪0</b></div></div>
+    <div class="sub" id="todayLine"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="days">0</b><span>ימים עם הכנסה</span></div>
+    <div class="stat"><b id="avg">₪0</b><span>ממוצע ליום</span></div>
+    <div class="stat"><b id="best">—</b><span>היום החזק</span></div>
+  </div>
+  <div class="add cardc">
+    <h2>שטרות ומטבעות החודש</h2>
+    <div id="counts-body" class="cb"></div>
+  </div>
+  <div class="add">
+    <h2>רישום תנועה בקופה</h2>
+    <div class="tabs"><button type="button" id="tIn" class="on">הכנסה</button><button type="button" id="tOut">הוצאה מהקופה</button></div>
+    <div class="row"><input id="date" type="date" aria-label="תאריך"></div>
+    <div class="tabs"><button type="button" id="tabD" class="on">לפי שטרות ומטבעות</button><button type="button" id="tabF">סכום חופשי</button></div>
+    <div id="paneD"><div id="grid" class="grid"></div><div class="dsum">סה״כ: <b id="dtotal">₪0</b></div></div>
+    <div id="paneF" hidden><div class="row"><input id="amount" type="number" inputmode="decimal" min="0" step="any" placeholder="סכום ב־₪" aria-label="סכום"></div></div>
+    <div class="row"><input id="note" type="text" placeholder="הערה (לא חובה)" aria-label="הערה"></div>
+    <div class="row"><input id="who" type="text" autocomplete="off" placeholder="שם מי שרושם (חובה)" aria-label="שם" hidden></div>
+    <div class="row"><input id="code" type="password" inputmode="numeric" autocomplete="off" placeholder="קוד לאישור הוצאה" aria-label="קוד" hidden></div>
+    <button class="btn" id="save">הוספה</button>
+    <div id="status" class="status" role="status"></div>
+  </div>
+  <div class="list">
+    <h2>הוצאות החודש ולמה</h2><div id="out-list"></div></div><div class="list" style="margin-top:18px"><h2>הכנסות לפי ימים</h2>
+    <div id="days-list"></div>
+  </div>
+  <div class="tools">
+    <button id="copy">העתקת סיכום חודשי</button>
+    <button id="csv">הורדה כ־CSV</button>
+  </div>
+</main>
+<script>
+(function(){
+  var KEY="cashIncome.v1", data=[], view=new Date(), mode="d", type="in", remote=[], remoteDocs={}, myId="", fillMode=false, db=null;
+  function delEntry(e){if(e.r){if(db){var p=e.id.split("|"),b=Object.assign({},remoteDocs[p[0]]);delete b[p[1]];db.collection("entries").doc(p[0]).set(b).catch(function(){})}}else{data=data.filter(function(z){return z.id!==e.id});persist();render()}}
+  var CODEHASH="03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", okCode=false;
+  function sha(s){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
+  function sg1(e){return e.x?-1:1}
+  function sg(e){return sg1(e)*e.a}
+  function flash(m){var s=document.getElementById("status");s.textContent=m;setTimeout(function(){s.textContent=""},2500)}
+  var DEN=[{v:200,t:"b"},{v:100,t:"b"},{v:50,t:"b"},{v:20,t:"b"},{v:10,t:"c"},{v:5,t:"c"},{v:2,t:"c"},{v:1,t:"c"},{v:0.5,t:"c"},{v:0.1,t:"c"}];
+  function dname(d){return d.v<1?Math.round(d.v*100)+" אג׳":"₪"+d.v}
+  function countsTotal(c){var s=0;for(var k in c)s+=Math.round(parseFloat(k)*100)*c[k];return s/100}
+  function countsText(c){var b=[],m=[];DEN.forEach(function(d){var n=c[d.v];if(n)(d.t==="b"?b:m).push(n+"×"+dname(d))});return [b.length?"שטרות: "+b.join(", "):"",m.length?"מטבעות: "+m.join(", "):""].filter(Boolean).join(" | ")}
+  function readCounts(){var c={},ins=document.getElementById("grid").querySelectorAll("input");for(var i=0;i<ins.length;i++){var n=parseInt(ins[i].value,10);if(n>0)c[ins[i].getAttribute("data-v")]=n}return c}
+  function updD(){document.getElementById("dtotal").textContent=money(countsTotal(readCounts()))}
+  function clearGrid(){var ins=document.getElementById("grid").querySelectorAll("input");for(var i=0;i<ins.length;i++)ins[i].value="";updD()}
+  function renderCounts(es){
+    var tot={},free=0,b=document.getElementById("counts-body");
+    es.forEach(function(e){if(e.c){for(var k in e.c)tot[k]=(tot[k]||0)+sg1(e)*e.c[k]}else free+=sg(e)});
+    var nb=0,nc=0;DEN.forEach(function(d){var n=tot[d.v]||0;if(d.t==="b")nb+=n;else nc+=n});
+    var txt=countsText(tot);
+    b.textContent=txt?nb+" שטרות, "+nc+" מטבעות\n"+txt.replace(" | ","\n"):"אין עדיין פירוט שטרות ומטבעות בחודש הזה.";
+    if(free)b.textContent+="\n(סכומים חופשיים בסך "+money(free)+" לא נכללים בספירה)";
+  }
+  view.setDate(1);
+  var $=function(i){return document.getElementById(i)};
+  function load(){try{var r=window.kupatStore?window.kupatStore.load():localStorage.getItem(KEY);data=r?JSON.parse(r):[]}catch(e){data=[]}}
+  function persist(){try{var j=JSON.stringify(data);if(window.kupatStore){window.kupatStore.save(j)}else{localStorage.setItem(KEY,j)}}catch(e){}}
+  function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+  function money(n){return "₪"+(Math.round(n*100)/100).toLocaleString("he-IL")}
+  function fmtDay(s){var p=s.split("-"),d=new Date(+p[0],+p[1]-1,+p[2]);return d.toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"numeric"})}
+  function monthKey(){return view.getFullYear()+"-"+String(view.getMonth()+1).padStart(2,"0")}
+  function monthEntries(){var k=monthKey();return data.concat(remote).filter(function(e){return e.d.indexOf(k)===0})}
+  function render(){
+    $("mlabel").textContent=view.toLocaleDateString("he-IL",{month:"long",year:"numeric"});
+    var es=monthEntries(),byDay={},sum=0;
+    es.forEach(function(e){if(!e.x)(byDay[e.d]=byDay[e.d]||[]).push(e);sum+=sg(e)});
+    var keys=Object.keys(byDay).sort().reverse();
+    $("sum").textContent=money(sum);renderCounts(es);
+    var inc=0,out=0;es.forEach(function(e){if(e.x)out+=e.a;else inc+=e.a});
+    $("incV").textContent=money(inc);$("outV").textContent=money(out);
+    var t=ymd(new Date()),tsum=0,tc={};
+    data.concat(remote).forEach(function(e){if(e.d===t){tsum+=sg(e);if(e.c)for(var k in e.c)tc[k]=(tc[k]||0)+sg1(e)*e.c[k]}});
+    var tct=countsText(tc);
+    $("todayLine").textContent="היום: "+money(tsum)+(tct?" – "+tct:"");
+    $("days").textContent=keys.length;
+    $("avg").textContent=money(keys.length?inc/keys.length:0);
+    var best=null,bv=0;keys.forEach(function(k){var s=byDay[k].reduce(function(x,e){return x+sg(e)},0);if(s>bv){bv=s;best=k}});
+    $("best").textContent=best?money(bv):"—";
+    var ob=$("out-list");ob.innerHTML="";
+    var ex=es.filter(function(e){return e.x}).sort(function(a,b){return a.d<b.d?1:-1});
+    if(!ex.length){var oe=document.createElement("div");oe.className="empty";oe.textContent="לא יצא כסף מהקופה בחודש הזה.";ob.appendChild(oe)}
+    ex.forEach(function(e){
+      var r=document.createElement("div");r.className="day out";
+      var h=document.createElement("div");h.className="dh";
+      var a=document.createElement("span");a.textContent=fmtDay(e.d);
+      var b=document.createElement("span");b.className="amt";b.textContent="−"+money(e.a);
+      h.appendChild(a);h.appendChild(b);r.appendChild(h);
+      var rs=document.createElement("div");rs.className="ent";
+      var l=document.createElement("span");l.textContent="סיבה: "+(e.n||"—")+(e.by?" | נרשם ע״י "+e.by:"")+(e.c?" ("+countsText(e.c)+")":"");
+      var x=document.createElement("button");x.textContent="מחיקה";x.onclick=function(){delEntry(e)};
+      rs.appendChild(l);rs.appendChild(x);r.appendChild(rs);ob.appendChild(r);
+    });
+    var box=$("days-list");box.innerHTML="";
+    if(!keys.length){var em=document.createElement("div");em.className="empty";em.textContent="עדיין אין הכנסות בחודש הזה. הוסיפו את הראשונה למעלה.";box.appendChild(em);return}
+    keys.forEach(function(k){
+      var list=byDay[k],ds=list.reduce(function(x,e){return x+sg(e)},0);
+      var el=document.createElement("div");el.className="day"+(k===t?" today":"");
+      var h=document.createElement("div");h.className="dh";
+      var a=document.createElement("span");a.textContent=fmtDay(k);
+      var b=document.createElement("span");b.className="amt";b.textContent=money(ds);
+      h.appendChild(a);h.appendChild(b);el.appendChild(h);
+      list.forEach(function(e){
+        var r=document.createElement("div");r.className="ent";
+        var l=document.createElement("span");if(e.x)l.style.color="var(--danger)";l.textContent=(e.x?"הוצאה ":"")+money(e.a)+(e.c?" ("+countsText(e.c)+")":"")+(e.n?" – "+e.n:"");
+        var x=document.createElement("button");x.textContent="מחיקה";x.setAttribute("aria-label","מחיקת הכנסה");
+        x.onclick=function(){if(e.r){if(db){var p=e.id.split("|"),b=Object.assign({},remoteDocs[p[0]]);delete b[p[1]];db.collection("entries").doc(p[0]).set(b).catch(function(){})}}else{data=data.filter(function(z){return z.id!==e.id});persist();render()}};
+        r.appendChild(l);r.appendChild(x);el.appendChild(r);
+      });
+      box.appendChild(el);
+    });
+  }
+  $("save").onclick=function(){
+    if(type==="out"&&!$("who").value.trim()){flash("יש לרשום שם");$("who").focus();return}
+    if(type==="out"&&!okCode){
+      sha($("code").value).then(function(h){if(h===CODEHASH){okCode=true;$("save").onclick();okCode=false}else{flash("קוד שגוי");$("code").focus()}},function(){flash("לא ניתן לאמת את הקוד")});
+      return;
+    }
+    var d=$("date").value,a,c=null;
+    if(mode==="d"){c=readCounts();a=countsTotal(c)}else{a=parseFloat($("amount").value)}
+    if(!d||isNaN(a)||a<=0)return;
+    var note=$("note").value.trim();
+    if(type==="out"&&!note){flash("יש לרשום סיבה להוצאה");$("note").focus();return}
+    var en={id:Date.now()+Math.random(),d:d,a:a,n:note};
+    if(type==="out"){en.x=1;en.by=$("who").value.trim()}
+    if(c)en.c=c;
+    if(fillMode){
+      delete en.id;
+      if(!db||!myId)return;
+      var key="e"+Date.now()+Math.floor(Math.random()*1e6),patch={};patch[key]=en;
+      var ref=db.collection("entries").doc(myId);
+      ref.update(patch).catch(function(){return ref.set(patch)}).then(function(){flash("נשמר ✓ תודה")},function(){flash("השמירה נכשלה, נסו שוב")});
+      $("amount").value="";$("note").value="";clearGrid();setType("in");return;
+    }
+    data.push(en);
+    persist();$("amount").value="";$("note").value="";clearGrid();setType("in");
+    var p=d.split("-");view=new Date(+p[0],+p[1]-1,1);render();$("amount").focus();
+  };
+  $("amount").addEventListener("keydown",function(e){if(e.key==="Enter")$("save").click()});
+  $("prev").onclick=function(){view.setMonth(view.getMonth()-1);render()};
+  $("next").onclick=function(){view.setMonth(view.getMonth()+1);render()};
+  function summaryText(){
+    var es=monthEntries(),inc=0,out=0,by={},ex=[];
+    es.forEach(function(e){if(e.x){out+=e.a;ex.push(e)}else{inc+=e.a;by[e.d]=(by[e.d]||0)+e.a}});
+    var s="סיכום "+$("mlabel").textContent+"\nנכנס: "+money(inc)+"\nיצא: "+money(out)+"\nנשאר בקופה: "+money(inc-out)+"\n\nהכנסות לפי ימים:\n";
+    Object.keys(by).sort().forEach(function(k){s+=fmtDay(k)+": "+money(by[k])+"\n"});
+    s+="\nהוצאות:\n";
+    if(!ex.length)s+="אין\n";
+    ex.sort(function(a,b){return a.d<b.d?-1:1}).forEach(function(e){s+=fmtDay(e.d)+": "+money(e.a)+" – "+(e.n||"ללא סיבה")+(e.by?" (נרשם ע״י "+e.by+")":"")+"\n"});
+    var tot={};es.forEach(function(e){if(e.c)for(var k in e.c)tot[k]=(tot[k]||0)+sg1(e)*e.c[k]});
+    var ct=countsText(tot);if(ct)s+="\nשטרות ומטבעות בקופה:\n"+ct.replace(" | ","\n");
+    return s;
+  }
+  function oldSummary(){
+    var es=monthEntries(),by={},sum=0;
+    es.forEach(function(e){by[e.d]=(by[e.d]||0)+sg(e);sum+=sg(e)});
+    var ks=Object.keys(by).sort();
+    var s="סיכום "+$("mlabel").textContent+"\n";
+    ks.forEach(function(k){s+=fmtDay(k)+": "+money(by[k])+"\n"});
+    s+="\nסה״כ: "+money(sum)+"\nממוצע ליום הכנסה: "+money(ks.length?sum/ks.length:0);
+    var tot={};es.forEach(function(e){if(e.c)for(var k in e.c)tot[k]=(tot[k]||0)+sg1(e)*e.c[k]});
+    var ct=countsText(tot);if(ct)s+="\n\nסך הכל החודש:\n"+ct.replace(" | ","\n");
+    return s;
+  }
+  $("copy").onclick=function(){
+    var s=summaryText();
+    try{navigator.clipboard.writeText(s).then(function(){$("copy").textContent="הועתק"},function(){alert(s)})}catch(e){alert(s)}
+    setTimeout(function(){$("copy").textContent="העתקת סיכום חודשי"},1800);
+  };
+  $("csv").onclick=function(){
+    var rows=["תאריך,סוג,סכום,הערה,פירוט,נרשם ע״י"];
+    monthEntries().sort(function(a,b){return a.d<b.d?-1:1}).forEach(function(e){rows.push(e.d+","+(e.x?"הוצאה":"הכנסה")+","+e.a+",\""+(e.n||"").replace(/"/g,'""')+"\",\""+(e.c?countsText(e.c):"")+"\",\""+(e.by||"")+"\"")});
+    var blob=new Blob(["\ufeff"+rows.join("\n")],{type:"text/csv;charset=utf-8"});
+    var u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download="income-"+monthKey()+".csv";document.body.appendChild(a);a.click();a.remove();
+  };
+  (function(){
+    var g=$("grid");
+    [["b","שטרות"],["c","מטבעות"]].forEach(function(grp){
+      var h=document.createElement("div");h.className="gh";h.textContent=grp[1];g.appendChild(h);
+      DEN.filter(function(d){return d.t===grp[0]}).forEach(function(d){
+        var lab=document.createElement("label");lab.className="dn";
+        var s=document.createElement("span");s.textContent=dname(d);
+        var i=document.createElement("input");i.type="number";i.min="0";i.step="1";i.inputMode="numeric";i.placeholder="0";i.setAttribute("data-v",d.v);i.setAttribute("aria-label","כמות "+dname(d));i.oninput=updD;
+        lab.appendChild(s);lab.appendChild(i);g.appendChild(lab);
+      });
+    });
+  })();
+  function setMode(m){mode=m;$("paneD").hidden=m!=="d";$("paneF").hidden=m!=="f";$("tabD").classList.toggle("on",m==="d");$("tabF").classList.toggle("on",m==="f")}
+  $("tabD").onclick=function(){setMode("d")};$("tabF").onclick=function(){setMode("f")};
+  function setType(t){type=t;$("tIn").classList.toggle("on",t==="in");$("tOut").classList.toggle("on",t==="out");$("note").placeholder=t==="out"?"סיבה להוצאה (חובה)":"הערה (לא חובה)";$("save").textContent=t==="out"?"רישום הוצאה":"הוספה";$("code").hidden=t!=="out";$("who").hidden=t!=="out";if(t!=="out")$("code").value=""}
+  $("tIn").onclick=function(){setType("in")};$("tOut").onclick=function(){setType("out")};
+  $("date").value=ymd(new Date());
+  load();render();
+  (async function(){
+    var g=$("gate"),m=$("main");
+    function showMain(){m.hidden=false;g.hidden=true}
+    if(!window.claude){showMain();return}
+    var u=null;
+    try{u=await claude.use("user")}catch(e){}
+    try{db=await claude.use("db")}catch(e){db=null}
+    var owner=!!(u&&(u.isOwner()||u.canEdit()))&&location.hash!=="#worker";
+    if(owner){
+      showMain();
+      if(db){try{db.collection("entries").onSnapshot(function(s){remote=[];remoteDocs={};s.docs.forEach(function(d){var b=d.data()||{};remoteDocs[d.id]=b;Object.keys(b).forEach(function(k){if(k.charAt(0)==="e"&&b[k]&&b[k].d){var o=Object.assign({},b[k]);o.id=d.id+"|"+k;o.r=true;remote.push(o)}})});render()},function(){})}catch(e){}}
+    }else if(u&&db){
+      try{myId=String(await u.id())}catch(e){}
+      fillMode=true;document.body.classList.add("fill");showMain();
+    }else{
+      g.textContent="כדי להוסיף נתונים צריך להתחבר לחשבון Claude ולקבל מהבעלים הרשאה.";
+    }
+  })();
+})();
+</script>
+</body>
+</html>
+
