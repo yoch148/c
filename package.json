@@ -18,12 +18,15 @@
     "productName": "KupatHayomi",
     "files": ["main.js", "preload.js", "app/**/*"],
     "win": {
-      "target": ["portable", "nsis"],
-      "artifactName": "${productName}-${version}-${target}.${ext}"
+      "target": ["portable", "nsis"]
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-${version}-setup.${ext}"
     }
   }
 }
